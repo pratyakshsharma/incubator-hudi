@@ -1,0 +1,1 @@
+select key, date, symbol, volume, open, close from default.stock_ticks_cow;
