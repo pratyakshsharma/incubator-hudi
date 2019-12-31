@@ -112,7 +112,7 @@ public class HiveIncrementalPuller {
     this.config = config;
     validateConfig(config);
     String templateContent =
-        FileIOUtils.readAsUTFString(this.getClass().getResourceAsStream("IncrementalPull.sqltemplate"));
+        FileIOUtils.readAsUTFString(this.getClass().getResourceAsStream("/IncrementalPull.sqltemplate"));
     incrementalPullSQLtemplate = new ST(templateContent);
   }
 
@@ -185,9 +185,9 @@ public class HiveIncrementalPuller {
       throw new HoodieIncrementalPullSQLException(
           "Incremental SQL does not have " + config.sourceDb + "." + config.sourceTable);
     }
-    if (!incrementalSQL.contains("`_hoodie_commit_time` > '%targetBasePath'")) {
+    if (!incrementalSQL.contains("`_hoodie_commit_time` > %s")) {
       LOG.info("Incremental SQL : " + incrementalSQL
-          + " does not contain `_hoodie_commit_time` > '%targetBasePath'. Please add "
+          + " does not contain `_hoodie_commit_time` > %s. Please add "
           + "this clause for incremental to work properly.");
       throw new HoodieIncrementalPullSQLException(
           "Incremental SQL does not have clause `_hoodie_commit_time` > '%targetBasePath', which "
