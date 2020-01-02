@@ -190,7 +190,7 @@ public class HiveIncrementalPuller {
           + " does not contain `_hoodie_commit_time` > %s. Please add "
           + "this clause for incremental to work properly.");
       throw new HoodieIncrementalPullSQLException(
-          "Incremental SQL does not have clause `_hoodie_commit_time` > '%targetBasePath', which "
+          "Incremental SQL does not have clause `_hoodie_commit_time` > %s, which "
               + "means its not pulling incrementally");
     }
 
@@ -219,7 +219,7 @@ public class HiveIncrementalPuller {
     // Set the from commit time
     executeStatement("set hoodie." + config.sourceTable + ".consume.start.timestamp=" + config.fromCommitTime, stmt);
     // Set number of commits to pull
-    executeStatement("set hoodie." + config.sourceTable + ".consume.max.commits=" + String.valueOf(config.maxCommits),
+    executeStatement("set hoodie." + config.sourceTable + ".consume.max.commits=" + config.maxCommits,
         stmt);
   }
 
@@ -233,14 +233,14 @@ public class HiveIncrementalPuller {
     stmt.execute(sql);
   }
 
-  private String inferCommitTime(FileSystem fs) throws SQLException, IOException {
+  private String inferCommitTime(FileSystem fs) throws IOException {
     LOG.info("FromCommitTime not specified. Trying to infer it from Hoodie dataset " + config.targetDb + "."
         + config.targetTable);
     String targetDataLocation = getTableLocation(config.targetDb, config.targetTable);
     return scanForCommitTime(fs, targetDataLocation);
   }
 
-  private String getTableLocation(String db, String table) throws SQLException {
+  private String getTableLocation(String db, String table) {
     ResultSet resultSet = null;
     Statement stmt = null;
     try {
@@ -309,7 +309,7 @@ public class HiveIncrementalPuller {
     return FileSystem.mkdirs(fs, targetBaseDirPath, new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.ALL));
   }
 
-  private String getLastCommitTimePulled(FileSystem fs, String sourceTableLocation) throws IOException {
+  private String getLastCommitTimePulled(FileSystem fs, String sourceTableLocation) {
     HoodieTableMetaClient metadata = new HoodieTableMetaClient(fs.getConf(), sourceTableLocation);
     List<String> commitsToSync = metadata.getActiveTimeline().getCommitsTimeline().filterCompletedInstants()
         .findInstantsAfter(config.fromCommitTime, config.maxCommits).getInstants().map(HoodieInstant::getTimestamp)
