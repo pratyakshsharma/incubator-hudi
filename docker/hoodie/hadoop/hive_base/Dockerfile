@@ -66,4 +66,5 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 ENV PATH $HIVE_HOME/bin/:$PATH
 
 ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "ulimit -c unlimited"]
 CMD startup.sh
